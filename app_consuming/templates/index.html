@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestion des Étudiants</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #1E3A5F; border-bottom: 3px solid #2563EB; padding-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #1E3A5F; color: white; padding: 10px; text-align: left; }
+        td { padding: 8px 10px; border-bottom: 1px solid #e2e8f0; }
+        tr:hover { background: #EFF6FF; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #CBD5E1; border-radius: 4px; }
+        button { background: #2563EB; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #1D4ED8; }
+        .btn-del { background: #DC2626; padding: 4px 10px; font-size: 12px; }
+        .error { background: #FEF2F2; border-left: 4px solid #DC2626; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>🎓 Gestion des Étudiants</h1>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <h2>Ajouter un étudiant</h2>
+    <form action="/add" method="post">
+        <div class="form-grid">
+            <input name="name" placeholder="Nom complet" required>
+            <input name="email" placeholder="Email" type="email" required>
+            <input name="major" placeholder="Spécialité">
+            <input name="gpa" placeholder="GPA (0-4)" type="number" step="0.01" min="0" max="4">
+        </div>
+        <button type="submit">Ajouter</button>
+    </form>
+
+    <h2>Liste des étudiants</h2>
+    <form method="get" style="display:flex; gap:10px; margin-bottom:10px;">
+        <input name="search" value="{{ search }}" placeholder="Rechercher...">
+        <input name="major" value="{{ major }}" placeholder="Filtrer par spécialité">
+        <button type="submit">Filtrer</button>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Spécialité</th>
+                <th>GPA</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in students %}
+            <tr>
+                <td>{{ s.id }}</td>
+                <td>{{ s.name }}</td>
+                <td>{{ s.email }}</td>
+                <td>{{ s.major or '—' }}</td>
+                <td>{{ s.gpa }}</td>
+                <td>
+                    <form action="/delete/{{ s.id }}" method="post" style="display:inline">
+                        <button class="btn-del" onclick="return confirm('Supprimer ?')">✕</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="text-align:center; color:#9CA3AF;">
+                    Aucun étudiant trouvé.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p style="color:#9CA3AF;">
+        Total : {{ students | length }} étudiant(s)
+    </p>
+</body>
+</html>
